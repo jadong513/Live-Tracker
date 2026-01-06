@@ -109,17 +109,34 @@ def create_app():
             signal = engine.analyze(df, symbol)
             info = fetcher.get_info(symbol)
 
-            # Price history for chart
+            # Price history for chart (clean NaN values)
             price_data = []
             for idx, row in df.tail(90).iterrows():
-                price_data.append({
-                    "date": idx.strftime("%Y-%m-%d"),
-                    "open": round(row["open"], 2),
-                    "high": round(row["high"], 2),
-                    "low": round(row["low"], 2),
-                    "close": round(row["close"], 2),
-                    "volume": int(row["volume"])
-                })
+                try:
+                    price_data.append({
+                        "date": idx.strftime("%Y-%m-%d"),
+                        "open": round(float(row["open"]), 2) if not math.isnan(row["open"]) else 0,
+                        "high": round(float(row["high"]), 2) if not math.isnan(row["high"]) else 0,
+                        "low": round(float(row["low"]), 2) if not math.isnan(row["low"]) else 0,
+                        "close": round(float(row["close"]), 2) if not math.isnan(row["close"]) else 0,
+                        "volume": int(row["volume"]) if not math.isnan(row["volume"]) else 0
+                    })
+                except:
+                    pass
+
+            # Clean all values for JSON
+            score = signal.score if signal.score and not math.isnan(signal.score) else 0
+            price = signal.price if signal.price and not math.isnan(signal.price) else 0
+            stop_loss = None
+            take_profit = None
+            risk_reward = None
+
+            if signal.stop_loss and not math.isnan(signal.stop_loss):
+                stop_loss = round(signal.stop_loss, 2)
+            if signal.take_profit and not math.isnan(signal.take_profit):
+                take_profit = round(signal.take_profit, 2)
+            if signal.risk_reward and not math.isnan(signal.risk_reward):
+                risk_reward = round(signal.risk_reward, 1)
 
             return jsonify({
                 "success": True,
@@ -127,14 +144,14 @@ def create_app():
                 "signal": {
                     "type": signal.signal_type.value,
                     "strength": signal.strength.value,
-                    "score": round(signal.score, 1),
-                    "stop_loss": round(signal.stop_loss, 2) if signal.stop_loss else None,
-                    "take_profit": round(signal.take_profit, 2) if signal.take_profit else None,
-                    "risk_reward": signal.risk_reward,
+                    "score": round(score, 1),
+                    "stop_loss": stop_loss,
+                    "take_profit": take_profit,
+                    "risk_reward": risk_reward,
                 },
-                "price": round(signal.price, 2),
-                "indicators": signal.indicators,
-                "info": info,
+                "price": round(price, 2),
+                "indicators": clean_for_json(signal.indicators),
+                "info": clean_for_json(info),
                 "price_history": price_data,
                 "timestamp": datetime.now().isoformat(),
             })
