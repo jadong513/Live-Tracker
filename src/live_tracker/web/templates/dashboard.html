@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Tracker - Trading Dashboard</title>
+    <title>Live Tracker - Professional Trading Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --border-color: #30363d;
-            --text-primary: #f0f6fc;
-            --text-secondary: #8b949e;
-            --green: #3fb950;
-            --green-bg: rgba(63, 185, 80, 0.15);
-            --red: #f85149;
-            --red-bg: rgba(248, 81, 73, 0.15);
-            --yellow: #d29922;
-            --yellow-bg: rgba(210, 153, 34, 0.15);
-            --blue: #58a6ff;
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: #151c2c;
+            --border-color: #2d3748;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --green: #10b981;
+            --green-bright: #34d399;
+            --green-bg: rgba(16, 185, 129, 0.15);
+            --red: #ef4444;
+            --red-bright: #f87171;
+            --red-bg: rgba(239, 68, 68, 0.15);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, 0.15);
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
@@ -37,7 +37,7 @@
 
         /* Header */
         .header {
-            background: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
             border-bottom: 1px solid var(--border-color);
             padding: 1rem 2rem;
             display: flex;
@@ -53,20 +53,40 @@
             font-weight: 700;
         }
 
-        .logo-icon {
-            font-size: 2rem;
+        .logo-icon { font-size: 2rem; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
-        .header-time {
+        .market-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         /* Main Layout */
         .main-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: calc(100vh - 60px);
+            grid-template-columns: 260px 1fr;
+            min-height: calc(100vh - 65px);
         }
 
         /* Sidebar */
@@ -74,53 +94,63 @@
             background: var(--bg-secondary);
             border-right: 1px solid var(--border-color);
             padding: 1.5rem;
+            overflow-y: auto;
         }
 
-        .sidebar-section {
-            margin-bottom: 2rem;
-        }
+        .sidebar-section { margin-bottom: 1.5rem; }
 
         .sidebar-title {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
-            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .watchlist-btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.85rem;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            margin-bottom: 0.5rem;
-            text-align: left;
+            margin-bottom: 0.4rem;
             transition: all 0.2s;
         }
 
         .watchlist-btn:hover {
-            background: var(--border-color);
+            background: var(--bg-card);
             border-color: var(--blue);
+            transform: translateX(4px);
         }
 
         .watchlist-btn.active {
             border-color: var(--blue);
-            background: rgba(88, 166, 255, 0.1);
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .watchlist-count {
+            background: var(--bg-primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
         }
 
         .custom-input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.85rem;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 0.5rem;
         }
 
@@ -131,10 +161,10 @@
 
         .scan-btn {
             width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--blue);
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
@@ -143,66 +173,135 @@
         }
 
         .scan-btn:hover {
-            background: #4393e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
-        .scan-btn:disabled {
-            background: var(--bg-tertiary);
-            cursor: not-allowed;
-        }
-
-        /* Content Area */
+        /* Content */
         .content {
             padding: 1.5rem 2rem;
+            overflow-y: auto;
         }
 
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Top Opportunities */
+        .opportunities-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .content-title {
-            font-size: 1.25rem;
+        .opportunity-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .opportunity-card.buy { border-left: 4px solid var(--green); }
+        .opportunity-card.sell { border-left: 4px solid var(--red); }
+
+        .opportunity-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
             font-weight: 600;
         }
 
-        .summary-cards {
+        .opportunity-header.buy { color: var(--green-bright); }
+        .opportunity-header.sell { color: var(--red-bright); }
+
+        .top-pick {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-pick:hover {
+            background: var(--bg-secondary);
+        }
+
+        .pick-symbol {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .pick-details {
+            text-align: right;
+        }
+
+        .pick-score {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .pick-score.buy { color: var(--green-bright); }
+        .pick-score.sell { color: var(--red-bright); }
+
+        .pick-reason {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Summary Stats */
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        .summary-card {
-            background: var(--bg-secondary);
+        .stat-card {
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.25rem;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
         }
 
-        .summary-card-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .summary-card-value {
+        .stat-value {
             font-size: 1.75rem;
             font-weight: 700;
+            margin-bottom: 0.25rem;
         }
 
-        .summary-card-value.green { color: var(--green); }
-        .summary-card-value.red { color: var(--red); }
-        .summary-card-value.yellow { color: var(--yellow); }
+        .stat-value.green { color: var(--green-bright); }
+        .stat-value.red { color: var(--red-bright); }
+        .stat-value.yellow { color: var(--yellow); }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         /* Signals Table */
-        .signals-table-container {
-            background: var(--bg-secondary);
+        .table-container {
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-title {
+            font-weight: 600;
         }
 
         .signals-table {
@@ -212,56 +311,77 @@
 
         .signals-table th {
             background: var(--bg-tertiary);
-            padding: 1rem;
+            padding: 0.85rem 1rem;
             text-align: left;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             color: var(--text-secondary);
             letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
         }
 
         .signals-table td {
-            padding: 1rem;
+            padding: 0.85rem 1rem;
             border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
         }
 
-        .signals-table tr:last-child td {
-            border-bottom: none;
-        }
+        .signals-table tr:last-child td { border-bottom: none; }
 
-        .signals-table tr:hover {
-            background: var(--bg-tertiary);
+        .signals-table tbody tr {
             cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .signals-table tbody tr:hover {
+            background: var(--bg-tertiary);
         }
 
         .symbol-cell {
-            font-weight: 600;
-            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        .price-cell {
-            font-family: 'SF Mono', Monaco, monospace;
+        .symbol-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .symbol-name {
+            font-weight: 600;
             font-size: 0.95rem;
         }
 
+        .price-cell {
+            font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
         .signal-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
             padding: 0.35rem 0.75rem;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.8rem;
             font-weight: 600;
         }
 
         .signal-badge.buy {
             background: var(--green-bg);
-            color: var(--green);
+            color: var(--green-bright);
         }
 
         .signal-badge.sell {
             background: var(--red-bg);
-            color: var(--red);
+            color: var(--red-bright);
         }
 
         .signal-badge.hold {
@@ -269,46 +389,44 @@
             color: var(--yellow);
         }
 
-        .strength-badge {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .score-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
         }
 
         .score-bar {
-            width: 100px;
-            height: 8px;
+            width: 80px;
+            height: 6px;
             background: var(--bg-tertiary);
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            position: relative;
         }
 
         .score-bar-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
+            border-radius: 3px;
         }
 
-        .score-bar-fill.positive {
-            background: var(--green);
-        }
-
-        .score-bar-fill.negative {
-            background: var(--red);
-        }
+        .score-bar-fill.positive { background: var(--green); }
+        .score-bar-fill.negative { background: var(--red); }
 
         .score-value {
             font-family: 'SF Mono', Monaco, monospace;
             font-size: 0.85rem;
-            margin-top: 0.25rem;
+            font-weight: 600;
         }
 
-        .sparkline {
-            width: 80px;
-            height: 30px;
+        .score-value.positive { color: var(--green-bright); }
+        .score-value.negative { color: var(--red-bright); }
+
+        .reason-cell {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            max-width: 200px;
         }
 
-        /* Detail Modal */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -316,22 +434,21 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(4px);
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 900px;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1000px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -342,142 +459,223 @@
             align-items: center;
             padding: 1.5rem;
             border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
         }
 
-        .modal-title {
-            font-size: 1.5rem;
+        .modal-title-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-symbol {
+            font-size: 1.75rem;
             font-weight: 700;
         }
 
+        .modal-price {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
         .modal-close {
-            background: none;
+            background: var(--bg-tertiary);
             border: none;
             color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .detail-card {
-            background: var(--bg-tertiary);
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
-            padding: 1.25rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .detail-card-title {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
+        .modal-close:hover {
+            background: var(--red-bg);
+            color: var(--red);
         }
 
-        .detail-signal {
+        .modal-body { padding: 1.5rem; }
+
+        /* Signal Summary Card */
+        .signal-summary {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .summary-main {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .summary-main.buy { background: var(--green-bg); }
+        .summary-main.sell { background: var(--red-bg); }
+        .summary-main.hold { background: var(--yellow-bg); }
+
+        .summary-signal {
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
-        .detail-signal.buy { color: var(--green); }
-        .detail-signal.sell { color: var(--red); }
-        .detail-signal.hold { color: var(--yellow); }
+        .summary-signal.buy { color: var(--green-bright); }
+        .summary-signal.sell { color: var(--red-bright); }
+        .summary-signal.hold { color: var(--yellow); }
 
-        .indicators-list {
-            max-height: 300px;
-            overflow-y: auto;
+        .summary-score {
+            font-size: 1rem;
+            color: var(--text-secondary);
         }
 
-        .indicator-item {
+        .trade-setup {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .trade-setup-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .trade-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
+            padding: 0.5rem 0;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .indicator-item:last-child {
-            border-bottom: none;
+        .trade-row:last-child { border-bottom: none; }
+
+        .trade-label { color: var(--text-secondary); font-size: 0.85rem; }
+
+        .trade-value { font-weight: 600; font-size: 0.9rem; }
+
+        .trade-value.green { color: var(--green-bright); }
+        .trade-value.red { color: var(--red-bright); }
+
+        /* Analysis Section */
+        .analysis-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key-insight {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--blue);
+        }
+
+        .insight-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Indicators Grid */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .indicator-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .indicator-name {
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .indicator-signal {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
+            font-weight: 600;
         }
 
-        .indicator-signal.buy { background: var(--green-bg); color: var(--green); }
-        .indicator-signal.sell { background: var(--red-bg); color: var(--red); }
+        .indicator-signal.buy { background: var(--green-bg); color: var(--green-bright); }
+        .indicator-signal.sell { background: var(--red-bg); color: var(--red-bright); }
         .indicator-signal.neutral { background: var(--yellow-bg); color: var(--yellow); }
 
         /* Chart */
-        .chart-container {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1.5rem;
+        .chart-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
         }
 
-        /* Loading */
+        /* Loading & Empty States */
         .loading {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 3rem;
+            padding: 4rem;
             color: var(--text-secondary);
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border: 3px solid var(--border-color);
             border-top-color: var(--blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 1rem;
+            margin-bottom: 1rem;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
             color: var(--text-secondary);
         }
 
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
+        .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
 
         /* Responsive */
-        @media (max-width: 1024px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .opportunities-section { grid-template-columns: 1fr; }
+        }
 
-            .sidebar {
-                display: none;
-            }
-
-            .summary-cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media (max-width: 768px) {
+            .main-container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .signal-summary { grid-template-columns: 1fr; }
+            .indicators-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -487,16 +685,31 @@
             <span class="logo-icon">📈</span>
             <span>Live Tracker</span>
         </div>
-        <div class="header-time" id="currentTime"></div>
+        <div class="header-right">
+            <div class="market-status">
+                <span class="status-dot"></span>
+                <span>Market Data Live</span>
+            </div>
+            <div id="currentTime" style="color: var(--text-secondary); font-size: 0.85rem;"></div>
+        </div>
     </header>
 
     <div class="main-container">
         <aside class="sidebar">
             <div class="sidebar-section">
+                <div class="sidebar-title">Quick Scan</div>
+                <button class="watchlist-btn" onclick="scanWatchlist('top10', ['SPY','QQQ','AAPL','MSFT','GOOGL','AMZN','NVDA','TSLA','AMD','META'])">
+                    <span>🔥 Top 10 Stocks</span>
+                    <span class="watchlist-count">10</span>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
                 <div class="sidebar-title">Watchlists</div>
                 {% for name, symbols in watchlists.items() %}
                 <button class="watchlist-btn" onclick="scanWatchlist('{{ name }}', {{ symbols | tojson }})">
-                    {{ name | capitalize }} ({{ symbols | length }})
+                    <span>{{ name | capitalize }}</span>
+                    <span class="watchlist-count">{{ symbols | length }}</span>
                 </button>
                 {% endfor %}
             </div>
@@ -505,51 +718,17 @@
                 <div class="sidebar-title">Custom Scan</div>
                 <input type="text" class="custom-input" id="customSymbols" placeholder="AAPL, NVDA, TSLA...">
                 <button class="scan-btn" onclick="scanCustom()">
-                    Scan Symbols
-                </button>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-title">Quick Actions</div>
-                <button class="watchlist-btn" onclick="scanWatchlist('all', ['SPY','QQQ','AAPL','MSFT','GOOGL','AMZN','NVDA','TSLA','AMD','META'])">
-                    🔥 Scan Top 10
-                </button>
-                <button class="watchlist-btn" onclick="refreshScan()">
-                    🔄 Refresh
+                    🔍 Scan Symbols
                 </button>
             </div>
         </aside>
 
         <main class="content">
-            <div class="content-header">
-                <h1 class="content-title" id="scanTitle">Market Scanner</h1>
-            </div>
-
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-card-label">Total Scanned</div>
-                    <div class="summary-card-value" id="totalScanned">0</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-label">Buy Signals</div>
-                    <div class="summary-card-value green" id="buySignals">0</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-label">Sell Signals</div>
-                    <div class="summary-card-value red" id="sellSignals">0</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-label">Strong Signals</div>
-                    <div class="summary-card-value yellow" id="strongSignals">0</div>
-                </div>
-            </div>
-
-            <div class="signals-table-container">
-                <div id="tableContent">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📊</div>
-                        <p>Select a watchlist or enter symbols to scan</p>
-                    </div>
+            <div id="mainContent">
+                <div class="empty-state">
+                    <div class="empty-icon">🎯</div>
+                    <h3 style="margin-bottom: 0.5rem;">Ready to Scan</h3>
+                    <p>Select a watchlist or enter symbols to analyze</p>
                 </div>
             </div>
         </main>
@@ -559,13 +738,16 @@
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Symbol Details</h2>
+                <div class="modal-title-section">
+                    <span class="modal-symbol" id="modalSymbol">AAPL</span>
+                    <span class="modal-price" id="modalPrice">$150.00</span>
+                </div>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading...
+                    <span>Analyzing...</span>
                 </div>
             </div>
         </div>
@@ -574,52 +756,64 @@
     <script>
         // Update time
         function updateTime() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent = now.toLocaleString();
+            document.getElementById('currentTime').textContent = new Date().toLocaleString();
         }
         setInterval(updateTime, 1000);
         updateTime();
 
-        // Current symbols being scanned
         let currentSymbols = [];
+        let lastResults = [];
+
+        // Generate trading insight based on indicators
+        function generateInsight(result) {
+            const dominated = [];
+            if (result.indicators) {
+                for (const [name, data] of Object.entries(result.indicators)) {
+                    if (data.signal.includes('STRONG')) {
+                        dominated.push(name);
+                    }
+                }
+            }
+
+            if (result.signal === 'BUY') {
+                if (result.strength === 'STRONG') {
+                    return `Strong bullish momentum. ${dominated.length > 0 ? dominated.slice(0,2).join(', ') + ' showing strength.' : 'Multiple indicators aligned.'}`;
+                }
+                return 'Moderate buy signal with improving technicals.';
+            } else if (result.signal === 'SELL') {
+                if (result.strength === 'STRONG') {
+                    return `Strong bearish pressure. ${dominated.length > 0 ? dominated.slice(0,2).join(', ') + ' signaling weakness.' : 'Multiple sell signals detected.'}`;
+                }
+                return 'Caution advised - bearish signals present.';
+            }
+            return 'Mixed signals - wait for clearer direction.';
+        }
 
         // Scan watchlist
         async function scanWatchlist(name, symbols) {
             currentSymbols = symbols;
-            document.getElementById('scanTitle').textContent = `${name.charAt(0).toUpperCase() + name.slice(1)} Watchlist`;
-
-            // Update active state
             document.querySelectorAll('.watchlist-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            await performScan(symbols);
+            if (event && event.target) {
+                event.target.closest('.watchlist-btn').classList.add('active');
+            }
+            await performScan(symbols, name);
         }
 
-        // Scan custom symbols
+        // Scan custom
         async function scanCustom() {
             const input = document.getElementById('customSymbols').value;
             if (!input.trim()) return;
-
             const symbols = input.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
             currentSymbols = symbols;
-            document.getElementById('scanTitle').textContent = 'Custom Scan';
-
-            await performScan(symbols);
+            await performScan(symbols, 'Custom');
         }
 
-        // Refresh current scan
-        async function refreshScan() {
-            if (currentSymbols.length > 0) {
-                await performScan(currentSymbols);
-            }
-        }
-
-        // Perform the scan
-        async function performScan(symbols) {
-            document.getElementById('tableContent').innerHTML = `
+        // Perform scan
+        async function performScan(symbols, scanName) {
+            document.getElementById('mainContent').innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Scanning ${symbols.length} symbols...
+                    <span>Scanning ${symbols.length} symbols...</span>
                 </div>
             `;
 
@@ -631,189 +825,288 @@
                 });
 
                 const data = await response.json();
-
                 if (data.success) {
-                    displayResults(data.results);
+                    lastResults = data.results;
+                    displayResults(data.results, scanName);
                 }
             } catch (error) {
-                document.getElementById('tableContent').innerHTML = `
+                document.getElementById('mainContent').innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">⚠️</div>
-                        <p>Error scanning symbols: ${error.message}</p>
+                        <div class="empty-icon">⚠️</div>
+                        <p>Error: ${error.message}</p>
                     </div>
                 `;
             }
         }
 
-        // Display scan results
-        function displayResults(results) {
-            // Update summary
-            document.getElementById('totalScanned').textContent = results.length;
-            document.getElementById('buySignals').textContent = results.filter(r => r.signal === 'BUY').length;
-            document.getElementById('sellSignals').textContent = results.filter(r => r.signal === 'SELL').length;
-            document.getElementById('strongSignals').textContent = results.filter(r => r.strength === 'STRONG').length;
-
-            // Sort by score
+        // Display results
+        function displayResults(results, scanName) {
             results.sort((a, b) => b.score - a.score);
 
-            // Build table
+            const buys = results.filter(r => r.signal === 'BUY');
+            const sells = results.filter(r => r.signal === 'SELL');
+            const strongBuys = buys.filter(r => r.strength === 'STRONG');
+            const strongSells = sells.filter(r => r.strength === 'STRONG');
+
+            // Top picks
+            const topBuy = buys[0];
+            const topSell = sells[sells.length - 1];
+
             let html = `
-                <table class="signals-table">
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Price</th>
-                            <th>Signal</th>
-                            <th>Score</th>
-                            <th>Stop Loss</th>
-                            <th>Take Profit</th>
-                            <th>Trend</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <!-- Top Opportunities -->
+                <div class="opportunities-section">
+                    <div class="opportunity-card buy">
+                        <div class="opportunity-header buy">
+                            <span>🚀</span> Top Buy Opportunities
+                        </div>
+                        ${buys.slice(0, 3).map(r => `
+                            <div class="top-pick" onclick="showDetails('${r.symbol}')">
+                                <div>
+                                    <div class="pick-symbol">${r.symbol}</div>
+                                    <div class="pick-reason">${generateInsight(r)}</div>
+                                </div>
+                                <div class="pick-details">
+                                    <div class="pick-score buy">+${r.score.toFixed(0)}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">$${r.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `).join('') || '<div style="color: var(--text-secondary); padding: 1rem;">No buy signals found</div>'}
+                    </div>
+
+                    <div class="opportunity-card sell">
+                        <div class="opportunity-header sell">
+                            <span>⚠️</span> Sell / Avoid
+                        </div>
+                        ${sells.slice(-3).reverse().map(r => `
+                            <div class="top-pick" onclick="showDetails('${r.symbol}')">
+                                <div>
+                                    <div class="pick-symbol">${r.symbol}</div>
+                                    <div class="pick-reason">${generateInsight(r)}</div>
+                                </div>
+                                <div class="pick-details">
+                                    <div class="pick-score sell">${r.score.toFixed(0)}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">$${r.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `).join('') || '<div style="color: var(--text-secondary); padding: 1rem;">No sell signals found</div>'}
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value">${results.length}</div>
+                        <div class="stat-label">Scanned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value green">${buys.length}</div>
+                        <div class="stat-label">Buy Signals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value red">${sells.length}</div>
+                        <div class="stat-label">Sell Signals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value green">${strongBuys.length}</div>
+                        <div class="stat-label">Strong Buys</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value red">${strongSells.length}</div>
+                        <div class="stat-label">Strong Sells</div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">📊 ${scanName} Scan Results</div>
+                    </div>
+                    <table class="signals-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Price</th>
+                                <th>Signal</th>
+                                <th>Score</th>
+                                <th>Stop Loss</th>
+                                <th>Target</th>
+                                <th>Analysis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
             `;
 
-            for (const result of results) {
-                if (result.error) continue;
-
-                const signalClass = result.signal.toLowerCase();
-                const scoreClass = result.score >= 0 ? 'positive' : 'negative';
-                const scoreWidth = Math.min(Math.abs(result.score), 100);
+            for (const r of results) {
+                if (r.error) continue;
+                const signalClass = r.signal.toLowerCase();
+                const scoreClass = r.score >= 0 ? 'positive' : 'negative';
 
                 html += `
-                    <tr onclick="showDetails('${result.symbol}')">
-                        <td class="symbol-cell">${result.symbol}</td>
-                        <td class="price-cell">$${result.price.toFixed(2)}</td>
+                    <tr onclick="showDetails('${r.symbol}')">
                         <td>
-                            <span class="signal-badge ${signalClass}">${result.signal}</span>
-                            <div class="strength-badge">${result.strength}</div>
-                        </td>
-                        <td>
-                            <div class="score-bar">
-                                <div class="score-bar-fill ${scoreClass}" style="width: ${scoreWidth}%"></div>
+                            <div class="symbol-cell">
+                                <div class="symbol-icon">${r.symbol.slice(0,2)}</div>
+                                <span class="symbol-name">${r.symbol}</span>
                             </div>
-                            <div class="score-value">${result.score > 0 ? '+' : ''}${result.score.toFixed(1)}</div>
                         </td>
-                        <td class="price-cell">${result.stop_loss ? '$' + result.stop_loss.toFixed(2) : '-'}</td>
-                        <td class="price-cell">${result.take_profit ? '$' + result.take_profit.toFixed(2) : '-'}</td>
-                        <td><canvas class="sparkline" id="spark-${result.symbol}"></canvas></td>
+                        <td class="price-cell">$${r.price.toFixed(2)}</td>
+                        <td>
+                            <span class="signal-badge ${signalClass}">
+                                ${r.signal === 'BUY' ? '↑' : r.signal === 'SELL' ? '↓' : '→'} ${r.signal}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="score-cell">
+                                <div class="score-bar">
+                                    <div class="score-bar-fill ${scoreClass}" style="width: ${Math.min(Math.abs(r.score), 100)}%"></div>
+                                </div>
+                                <span class="score-value ${scoreClass}">${r.score > 0 ? '+' : ''}${r.score.toFixed(0)}</span>
+                            </div>
+                        </td>
+                        <td class="price-cell" style="color: var(--red-bright);">${r.stop_loss ? '$' + r.stop_loss.toFixed(2) : '-'}</td>
+                        <td class="price-cell" style="color: var(--green-bright);">${r.take_profit ? '$' + r.take_profit.toFixed(2) : '-'}</td>
+                        <td class="reason-cell">${generateInsight(r)}</td>
                     </tr>
                 `;
             }
 
-            html += '</tbody></table>';
-            document.getElementById('tableContent').innerHTML = html;
-
-            // Draw sparklines
-            for (const result of results) {
-                if (result.error || !result.price_history) continue;
-                drawSparkline(`spark-${result.symbol}`, result.price_history, result.signal);
-            }
+            html += '</tbody></table></div>';
+            document.getElementById('mainContent').innerHTML = html;
         }
 
-        // Draw sparkline chart
-        function drawSparkline(canvasId, data, signal) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            const color = signal === 'BUY' ? '#3fb950' : signal === 'SELL' ? '#f85149' : '#d29922';
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map((_, i) => i),
-                    datasets: [{
-                        data: data,
-                        borderColor: color,
-                        borderWidth: 1.5,
-                        fill: false,
-                        pointRadius: 0,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { display: false },
-                        y: { display: false }
-                    }
-                }
-            });
-        }
-
-        // Show detail modal
+        // Show details
         async function showDetails(symbol) {
             document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('modalTitle').textContent = symbol;
+            document.getElementById('modalSymbol').textContent = symbol;
             document.getElementById('modalBody').innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading analysis...
+                    <span>Loading detailed analysis...</span>
                 </div>
             `;
 
             try {
                 const response = await fetch(`/api/analyze/${symbol}`);
                 const data = await response.json();
-
                 if (data.success) {
-                    displayDetails(data);
+                    displayDetailModal(data);
                 }
             } catch (error) {
                 document.getElementById('modalBody').innerHTML = `
                     <div class="empty-state">
-                        <p>Error loading details: ${error.message}</p>
+                        <p>Error: ${error.message}</p>
                     </div>
                 `;
             }
         }
 
-        // Display detail modal content
-        function displayDetails(data) {
+        // Display detail modal
+        function displayDetailModal(data) {
+            document.getElementById('modalPrice').textContent = `$${data.price.toFixed(2)}`;
             const signalClass = data.signal.type.toLowerCase();
 
-            let indicatorsHtml = '';
+            // Count bullish/bearish indicators
+            let bullish = 0, bearish = 0, neutral = 0;
+            const keySignals = [];
+
+            for (const [name, ind] of Object.entries(data.indicators)) {
+                if (ind.signal.includes('BUY')) {
+                    bullish++;
+                    if (ind.signal.includes('STRONG')) keySignals.push({name, type: 'bullish', desc: ind.description});
+                } else if (ind.signal.includes('SELL')) {
+                    bearish++;
+                    if (ind.signal.includes('STRONG')) keySignals.push({name, type: 'bearish', desc: ind.description});
+                } else {
+                    neutral++;
+                }
+            }
+
+            let html = `
+                <div class="signal-summary">
+                    <div class="summary-main ${signalClass}">
+                        <div class="summary-signal ${signalClass}">
+                            ${data.signal.type === 'BUY' ? '🚀' : data.signal.type === 'SELL' ? '🔻' : '➡️'}
+                            ${data.signal.strength} ${data.signal.type}
+                        </div>
+                        <div class="summary-score">Score: ${data.signal.score > 0 ? '+' : ''}${data.signal.score.toFixed(0)} / 100</div>
+                    </div>
+
+                    <div class="trade-setup">
+                        <div class="trade-setup-title">📋 Trade Setup</div>
+                        <div class="trade-row">
+                            <span class="trade-label">Entry Price</span>
+                            <span class="trade-value">$${data.price.toFixed(2)}</span>
+                        </div>
+                        <div class="trade-row">
+                            <span class="trade-label">Stop Loss</span>
+                            <span class="trade-value red">${data.signal.stop_loss ? '$' + data.signal.stop_loss.toFixed(2) : 'N/A'}</span>
+                        </div>
+                        <div class="trade-row">
+                            <span class="trade-label">Take Profit</span>
+                            <span class="trade-value green">${data.signal.take_profit ? '$' + data.signal.take_profit.toFixed(2) : 'N/A'}</span>
+                        </div>
+                        <div class="trade-row">
+                            <span class="trade-label">Risk/Reward</span>
+                            <span class="trade-value">1:${data.signal.risk_reward ? data.signal.risk_reward.toFixed(1) : 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    <div class="trade-setup">
+                        <div class="trade-setup-title">📊 Indicator Summary</div>
+                        <div class="trade-row">
+                            <span class="trade-label">Bullish</span>
+                            <span class="trade-value green">${bullish}</span>
+                        </div>
+                        <div class="trade-row">
+                            <span class="trade-label">Bearish</span>
+                            <span class="trade-value red">${bearish}</span>
+                        </div>
+                        <div class="trade-row">
+                            <span class="trade-label">Neutral</span>
+                            <span class="trade-value">${neutral}</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${keySignals.length > 0 ? `
+                <div class="analysis-section">
+                    <div class="analysis-title">💡 Key Insights</div>
+                    ${keySignals.slice(0, 3).map(s => `
+                        <div class="key-insight">
+                            <div class="insight-text"><strong>${s.name}:</strong> ${s.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                <div class="analysis-section">
+                    <div class="analysis-title">📈 All Indicators</div>
+                    <div class="indicators-grid">
+            `;
+
             for (const [name, ind] of Object.entries(data.indicators)) {
                 const indClass = ind.signal.includes('BUY') ? 'buy' : ind.signal.includes('SELL') ? 'sell' : 'neutral';
-                indicatorsHtml += `
-                    <div class="indicator-item">
+                html += `
+                    <div class="indicator-card">
                         <span class="indicator-name">${name}</span>
-                        <span class="indicator-signal ${indClass}">${ind.signal} (${(ind.confidence * 100).toFixed(0)}%)</span>
+                        <span class="indicator-signal ${indClass}">${ind.signal.replace('STRONG_', '⭐')}</span>
                     </div>
                 `;
             }
 
-            document.getElementById('modalBody').innerHTML = `
-                <div class="detail-grid">
-                    <div class="detail-card">
-                        <div class="detail-card-title">Signal</div>
-                        <div class="detail-signal ${signalClass}">${data.signal.strength} ${data.signal.type}</div>
-                        <div>Score: ${data.signal.score > 0 ? '+' : ''}${data.signal.score.toFixed(1)} / 100</div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-card-title">Trade Setup</div>
-                        <div style="margin-bottom: 0.5rem"><strong>Entry:</strong> $${data.price.toFixed(2)}</div>
-                        <div style="margin-bottom: 0.5rem"><strong>Stop Loss:</strong> ${data.signal.stop_loss ? '$' + data.signal.stop_loss.toFixed(2) : 'N/A'}</div>
-                        <div><strong>Take Profit:</strong> ${data.signal.take_profit ? '$' + data.signal.take_profit.toFixed(2) : 'N/A'}</div>
+            html += `
                     </div>
                 </div>
 
-                <div class="detail-card">
-                    <div class="detail-card-title">Indicator Breakdown</div>
-                    <div class="indicators-list">
-                        ${indicatorsHtml}
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <canvas id="priceChart" height="200"></canvas>
+                <div class="chart-section">
+                    <div class="analysis-title">📉 Price Chart (90 Days)</div>
+                    <canvas id="priceChart" height="250"></canvas>
                 </div>
             `;
 
-            // Draw price chart
+            document.getElementById('modalBody').innerHTML = html;
+
+            // Draw chart
             if (data.price_history && data.price_history.length > 0) {
                 const ctx = document.getElementById('priceChart').getContext('2d');
                 new Chart(ctx, {
@@ -821,45 +1114,34 @@
                     data: {
                         labels: data.price_history.map(p => p.date),
                         datasets: [{
-                            label: 'Close Price',
+                            label: 'Close',
                             data: data.price_history.map(p => p.close),
-                            borderColor: '#58a6ff',
-                            backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                            borderColor: data.signal.type === 'BUY' ? '#10b981' : data.signal.type === 'SELL' ? '#ef4444' : '#f59e0b',
+                            backgroundColor: data.signal.type === 'BUY' ? 'rgba(16,185,129,0.1)' : data.signal.type === 'SELL' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)',
                             fill: true,
-                            tension: 0.3
+                            tension: 0.3,
+                            pointRadius: 0
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            legend: { display: false }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
-                            x: {
-                                grid: { color: '#30363d' },
-                                ticks: { color: '#8b949e', maxTicksLimit: 8 }
-                            },
-                            y: {
-                                grid: { color: '#30363d' },
-                                ticks: { color: '#8b949e' }
-                            }
+                            x: { grid: { color: '#2d3748' }, ticks: { color: '#9ca3af', maxTicksLimit: 8 } },
+                            y: { grid: { color: '#2d3748' }, ticks: { color: '#9ca3af' } }
                         }
                     }
                 });
             }
         }
 
-        // Close modal
         function closeModal(event) {
             if (!event || event.target === document.getElementById('modalOverlay')) {
                 document.getElementById('modalOverlay').classList.remove('active');
             }
         }
 
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
     </script>
 </body>
 </html>
