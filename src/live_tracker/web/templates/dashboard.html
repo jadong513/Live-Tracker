@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracker - Trading Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --green: #3fb950;
+            --green-bg: rgba(63, 185, 80, 0.15);
+            --red: #f85149;
+            --red-bg: rgba(248, 81, 73, 0.15);
+            --yellow: #d29922;
+            --yellow-bg: rgba(210, 153, 34, 0.15);
+            --blue: #58a6ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .watchlist-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .watchlist-btn:hover {
+            background: var(--border-color);
+            border-color: var(--blue);
+        }
+
+        .watchlist-btn.active {
+            border-color: var(--blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--blue);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            background: #4393e6;
+        }
+
+        .scan-btn:disabled {
+            background: var(--bg-tertiary);
+            cursor: not-allowed;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 1.5rem 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .summary-card-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .summary-card-value.green { color: var(--green); }
+        .summary-card-value.red { color: var(--red); }
+        .summary-card-value.yellow { color: var(--yellow); }
+
+        /* Signals Table */
+        .signals-table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .signals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .signals-table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .signals-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .signals-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .signals-table tr:hover {
+            background: var(--bg-tertiary);
+            cursor: pointer;
+        }
+
+        .symbol-cell {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .price-cell {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.95rem;
+        }
+
+        .signal-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .signal-badge.buy {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .signal-badge.sell {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .signal-badge.hold {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+
+        .strength-badge {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .score-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .score-bar-fill.positive {
+            background: var(--green);
+        }
+
+        .score-bar-fill.negative {
+            background: var(--red);
+        }
+
+        .score-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .sparkline {
+            width: 80px;
+            height: 30px;
+        }
+
+        /* Detail Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .detail-card-title {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .detail-signal {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-signal.buy { color: var(--green); }
+        .detail-signal.sell { color: var(--red); }
+        .detail-signal.hold { color: var(--yellow); }
+
+        .indicators-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .indicator-item:last-child {
+            border-bottom: none;
+        }
+
+        .indicator-name {
+            font-weight: 500;
+        }
+
+        .indicator-signal {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .indicator-signal.buy { background: var(--green-bg); color: var(--green); }
+        .indicator-signal.sell { background: var(--red-bg); color: var(--red); }
+        .indicator-signal.neutral { background: var(--yellow-bg); color: var(--yellow); }
+
+        /* Chart */
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">📈</span>
+            <span>Live Tracker</span>
+        </div>
+        <div class="header-time" id="currentTime"></div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Watchlists</div>
+                {% for name, symbols in watchlists.items() %}
+                <button class="watchlist-btn" onclick="scanWatchlist('{{ name }}', {{ symbols | tojson }})">
+                    {{ name | capitalize }} ({{ symbols | length }})
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Custom Scan</div>
+                <input type="text" class="custom-input" id="customSymbols" placeholder="AAPL, NVDA, TSLA...">
+                <button class="scan-btn" onclick="scanCustom()">
+                    Scan Symbols
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Actions</div>
+                <button class="watchlist-btn" onclick="scanWatchlist('all', ['SPY','QQQ','AAPL','MSFT','GOOGL','AMZN','NVDA','TSLA','AMD','META'])">
+                    🔥 Scan Top 10
+                </button>
+                <button class="watchlist-btn" onclick="refreshScan()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <h1 class="content-title" id="scanTitle">Market Scanner</h1>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Scanned</div>
+                    <div class="summary-card-value" id="totalScanned">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Buy Signals</div>
+                    <div class="summary-card-value green" id="buySignals">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Sell Signals</div>
+                    <div class="summary-card-value red" id="sellSignals">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Strong Signals</div>
+                    <div class="summary-card-value yellow" id="strongSignals">0</div>
+                </div>
+            </div>
+
+            <div class="signals-table-container">
+                <div id="tableContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Select a watchlist or enter symbols to scan</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Symbol Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Current symbols being scanned
+        let currentSymbols = [];
+
+        // Scan watchlist
+        async function scanWatchlist(name, symbols) {
+            currentSymbols = symbols;
+            document.getElementById('scanTitle').textContent = `${name.charAt(0).toUpperCase() + name.slice(1)} Watchlist`;
+
+            // Update active state
+            document.querySelectorAll('.watchlist-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            await performScan(symbols);
+        }
+
+        // Scan custom symbols
+        async function scanCustom() {
+            const input = document.getElementById('customSymbols').value;
+            if (!input.trim()) return;
+
+            const symbols = input.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
+            currentSymbols = symbols;
+            document.getElementById('scanTitle').textContent = 'Custom Scan';
+
+            await performScan(symbols);
+        }
+
+        // Refresh current scan
+        async function refreshScan() {
+            if (currentSymbols.length > 0) {
+                await performScan(currentSymbols);
+            }
+        }
+
+        // Perform the scan
+        async function performScan(symbols) {
+            document.getElementById('tableContent').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Scanning ${symbols.length} symbols...
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbols })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.results);
+                }
+            } catch (error) {
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p>Error scanning symbols: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display scan results
+        function displayResults(results) {
+            // Update summary
+            document.getElementById('totalScanned').textContent = results.length;
+            document.getElementById('buySignals').textContent = results.filter(r => r.signal === 'BUY').length;
+            document.getElementById('sellSignals').textContent = results.filter(r => r.signal === 'SELL').length;
+            document.getElementById('strongSignals').textContent = results.filter(r => r.strength === 'STRONG').length;
+
+            // Sort by score
+            results.sort((a, b) => b.score - a.score);
+
+            // Build table
+            let html = `
+                <table class="signals-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Signal</th>
+                            <th>Score</th>
+                            <th>Stop Loss</th>
+                            <th>Take Profit</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (const result of results) {
+                if (result.error) continue;
+
+                const signalClass = result.signal.toLowerCase();
+                const scoreClass = result.score >= 0 ? 'positive' : 'negative';
+                const scoreWidth = Math.min(Math.abs(result.score), 100);
+
+                html += `
+                    <tr onclick="showDetails('${result.symbol}')">
+                        <td class="symbol-cell">${result.symbol}</td>
+                        <td class="price-cell">$${result.price.toFixed(2)}</td>
+                        <td>
+                            <span class="signal-badge ${signalClass}">${result.signal}</span>
+                            <div class="strength-badge">${result.strength}</div>
+                        </td>
+                        <td>
+                            <div class="score-bar">
+                                <div class="score-bar-fill ${scoreClass}" style="width: ${scoreWidth}%"></div>
+                            </div>
+                            <div class="score-value">${result.score > 0 ? '+' : ''}${result.score.toFixed(1)}</div>
+                        </td>
+                        <td class="price-cell">${result.stop_loss ? '$' + result.stop_loss.toFixed(2) : '-'}</td>
+                        <td class="price-cell">${result.take_profit ? '$' + result.take_profit.toFixed(2) : '-'}</td>
+                        <td><canvas class="sparkline" id="spark-${result.symbol}"></canvas></td>
+                    </tr>
+                `;
+            }
+
+            html += '</tbody></table>';
+            document.getElementById('tableContent').innerHTML = html;
+
+            // Draw sparklines
+            for (const result of results) {
+                if (result.error || !result.price_history) continue;
+                drawSparkline(`spark-${result.symbol}`, result.price_history, result.signal);
+            }
+        }
+
+        // Draw sparkline chart
+        function drawSparkline(canvasId, data, signal) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const color = signal === 'BUY' ? '#3fb950' : signal === 'SELL' ? '#f85149' : '#d29922';
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        borderWidth: 1.5,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Show detail modal
+        async function showDetails(symbol) {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('modalTitle').textContent = symbol;
+            document.getElementById('modalBody').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading analysis...
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/api/analyze/${symbol}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayDetails(data);
+                }
+            } catch (error) {
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="empty-state">
+                        <p>Error loading details: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display detail modal content
+        function displayDetails(data) {
+            const signalClass = data.signal.type.toLowerCase();
+
+            let indicatorsHtml = '';
+            for (const [name, ind] of Object.entries(data.indicators)) {
+                const indClass = ind.signal.includes('BUY') ? 'buy' : ind.signal.includes('SELL') ? 'sell' : 'neutral';
+                indicatorsHtml += `
+                    <div class="indicator-item">
+                        <span class="indicator-name">${name}</span>
+                        <span class="indicator-signal ${indClass}">${ind.signal} (${(ind.confidence * 100).toFixed(0)}%)</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-card">
+                        <div class="detail-card-title">Signal</div>
+                        <div class="detail-signal ${signalClass}">${data.signal.strength} ${data.signal.type}</div>
+                        <div>Score: ${data.signal.score > 0 ? '+' : ''}${data.signal.score.toFixed(1)} / 100</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-card-title">Trade Setup</div>
+                        <div style="margin-bottom: 0.5rem"><strong>Entry:</strong> $${data.price.toFixed(2)}</div>
+                        <div style="margin-bottom: 0.5rem"><strong>Stop Loss:</strong> ${data.signal.stop_loss ? '$' + data.signal.stop_loss.toFixed(2) : 'N/A'}</div>
+                        <div><strong>Take Profit:</strong> ${data.signal.take_profit ? '$' + data.signal.take_profit.toFixed(2) : 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-card-title">Indicator Breakdown</div>
+                    <div class="indicators-list">
+                        ${indicatorsHtml}
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="priceChart" height="200"></canvas>
+                </div>
+            `;
+
+            // Draw price chart
+            if (data.price_history && data.price_history.length > 0) {
+                const ctx = document.getElementById('priceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.price_history.map(p => p.date),
+                        datasets: [{
+                            label: 'Close Price',
+                            data: data.price_history.map(p => p.close),
+                            borderColor: '#58a6ff',
+                            backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#30363d' },
+                                ticks: { color: '#8b949e', maxTicksLimit: 8 }
+                            },
+                            y: {
+                                grid: { color: '#30363d' },
+                                ticks: { color: '#8b949e' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Close modal
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('modalOverlay')) {
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
