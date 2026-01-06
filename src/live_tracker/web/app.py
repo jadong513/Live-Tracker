@@ -6,6 +6,7 @@ Professional trading dashboard with real-time signals and analysis.
 
 import json
 import logging
+import math
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request
 
@@ -14,6 +15,19 @@ from live_tracker.signals.engine import SignalEngine
 from live_tracker.config import DEFAULT_WATCHLISTS
 
 logger = logging.getLogger(__name__)
+
+
+def clean_for_json(obj):
+    """Clean NaN and Inf values for JSON serialization."""
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return obj
+    elif isinstance(obj, dict):
+        return {k: clean_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_for_json(v) for v in obj]
+    return obj
 
 # Global instances
 fetcher = MarketDataFetcher()
@@ -50,22 +64,23 @@ def create_app():
                 if not df.empty:
                     signal = engine.analyze(df, symbol)
 
-                    # Get price history for sparkline
-                    price_history = df["close"].tail(30).tolist()
+                    # Get price history for sparkline (clean NaN values)
+                    price_history = [p if not math.isnan(p) else None for p in df["close"].tail(30).tolist()]
 
-                    results.append({
+                    result_data = {
                         "symbol": signal.symbol,
-                        "price": round(signal.price, 2),
+                        "price": round(signal.price, 2) if signal.price and not math.isnan(signal.price) else 0,
                         "signal": signal.signal_type.value,
                         "strength": signal.strength.value,
-                        "score": round(signal.score, 1),
-                        "stop_loss": round(signal.stop_loss, 2) if signal.stop_loss else None,
-                        "take_profit": round(signal.take_profit, 2) if signal.take_profit else None,
-                        "risk_reward": signal.risk_reward,
+                        "score": round(signal.score, 1) if not math.isnan(signal.score) else 0,
+                        "stop_loss": round(signal.stop_loss, 2) if signal.stop_loss and not math.isnan(signal.stop_loss) else None,
+                        "take_profit": round(signal.take_profit, 2) if signal.take_profit and not math.isnan(signal.take_profit) else None,
+                        "risk_reward": signal.risk_reward if signal.risk_reward and not math.isnan(signal.risk_reward) else None,
                         "price_history": price_history,
-                        "indicators": signal.indicators,
+                        "indicators": clean_for_json(signal.indicators),
                         "timestamp": signal.timestamp.isoformat(),
-                    })
+                    }
+                    results.append(result_data)
             except Exception as e:
                 logger.error(f"Error scanning {symbol}: {e}")
                 results.append({
